@@ -8,8 +8,11 @@ class wee {
 
     private static $instance;
     private static $config = [];
-    private static $routes = [];
-    private static $errorHandler;
+    private static $router;
+    private static $request;
+    private static $middlewares = [];
+    private static $beforeMiddleware = [];
+    private static $afterMiddleware = [];
 
     /**
      * Initialize the framework
@@ -23,6 +26,8 @@ class wee {
         self::registerAutoloader();
         self::registerErrorHandler();
         self::loadConfig();
+        self::$router = new App\Router();
+        self::$request = new App\Request();
 
         return self::$instance;
     }
@@ -253,10 +258,213 @@ class wee {
     }
 
     /**
+     * HTTP Method Routes
+     */
+    public static function get($path, $handler) {
+        return self::$router->get($path, $handler);
+    }
+
+    public static function post($path, $handler) {
+        return self::$router->post($path, $handler);
+    }
+
+    public static function put($path, $handler) {
+        return self::$router->put($path, $handler);
+    }
+
+    public static function delete($path, $handler) {
+        return self::$router->delete($path, $handler);
+    }
+
+    public static function patch($path, $handler) {
+        return self::$router->patch($path, $handler);
+    }
+
+    public static function any($path, $handler) {
+        return self::$router->any($path, $handler);
+    }
+
+    /**
+     * Route groups
+     */
+    public static function group($attributes, $callback) {
+        return self::$router->group($attributes, $callback);
+    }
+
+    /**
+     * RESTful resource routing
+     */
+    public static function resource($path, $controller) {
+        return self::$router->resource($path, $controller);
+    }
+
+    /**
+     * Get named route URL
+     */
+    public static function route($name, $params = []) {
+        return self::$router->route($name, $params);
+    }
+
+    /**
+     * Register named middleware
+     */
+    public static function middleware($name, $callback) {
+        self::$middlewares[$name] = $callback;
+    }
+
+    /**
+     * Register global before middleware
+     */
+    public static function before($callback) {
+        self::$beforeMiddleware[] = $callback;
+    }
+
+    /**
+     * Register global after middleware
+     */
+    public static function after($callback) {
+        self::$afterMiddleware[] = $callback;
+    }
+
+    /**
+     * Get Request instance
+     */
+    public static function request() {
+        return self::$request;
+    }
+
+    /**
      * Run the application
      */
     public static function run() {
-        // To be implemented in routing phase
-        echo "Wee Framework is running!";
+        $method = $_SERVER['REQUEST_METHOD'];
+        $uri = $_SERVER['REQUEST_URI'];
+
+        // Run before middleware
+        foreach (self::$beforeMiddleware as $middleware) {
+            $result = $middleware();
+            if ($result !== null) {
+                self::sendResponse($result);
+                return;
+            }
+        }
+
+        // Match route
+        $match = self::$router->dispatch($method, $uri);
+
+        if ($match === null) {
+            http_response_code(404);
+            echo '404 - Not Found';
+            return;
+        }
+
+        // Run route middleware
+        foreach ($match['middleware'] as $middlewareName) {
+            if (isset(self::$middlewares[$middlewareName])) {
+                $result = self::$middlewares[$middlewareName]();
+                if ($result !== null) {
+                    self::sendResponse($result);
+                    return;
+                }
+            }
+        }
+
+        // Execute handler
+        $response = self::executeHandler($match['handler'], $match['params']);
+
+        // Run after middleware
+        foreach (self::$afterMiddleware as $middleware) {
+            $middleware($response);
+        }
+
+        // Send response
+        self::sendResponse($response);
+    }
+
+    /**
+     * Execute route handler (closure or controller)
+     */
+    private static function executeHandler($handler, $params) {
+        // Closure handler
+        if (is_callable($handler)) {
+            return call_user_func_array($handler, array_values($params));
+        }
+
+        // Controller@method handler
+        if (is_string($handler) && strpos($handler, '@') !== false) {
+            list($controller, $method) = explode('@', $handler);
+
+            // Add App namespace if not present
+            if (strpos($controller, '\\') === false) {
+                $controller = 'App\\Controllers\\' . $controller;
+            }
+
+            if (!class_exists($controller)) {
+                throw new \Exception("Controller '$controller' not found");
+            }
+
+            $instance = new $controller();
+
+            if (!method_exists($instance, $method)) {
+                throw new \Exception("Method '$method' not found in controller '$controller'");
+            }
+
+            return call_user_func_array([$instance, $method], array_values($params));
+        }
+
+        throw new \Exception("Invalid route handler");
+    }
+
+    /**
+     * Send response to client
+     */
+    private static function sendResponse($response) {
+        // Response object
+        if ($response instanceof App\Response) {
+            $response->send();
+            return;
+        }
+
+        // Array/object - JSON response
+        if (is_array($response) || is_object($response)) {
+            header('Content-Type: application/json');
+            echo json_encode($response);
+        } else {
+            echo $response;
+        }
+    }
+
+    /**
+     * JSON response helper
+     */
+    public static function json($data, $statusCode = 200) {
+        http_response_code($statusCode);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
+
+    /**
+     * Redirect helper
+     */
+    public static function redirect($url, $statusCode = 302) {
+        header("Location: $url", true, $statusCode);
+        exit;
+    }
+
+    /**
+     * Create new Response instance
+     */
+    public static function response($content = '', $statusCode = 200) {
+        return (new App\Response())
+            ->setContent($content)
+            ->status($statusCode);
+    }
+
+    /**
+     * Create view response
+     */
+    public static function view($template, $data = []) {
+        return (new App\Response())->view($template, $data);
     }
 }

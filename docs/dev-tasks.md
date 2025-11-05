@@ -10,22 +10,22 @@
 - [x] Implement basic configuration system
 
 ### 1.2 Routing System
-- [ ] Build router class with HTTP method support (GET, POST, PUT, DELETE, PATCH)
-- [ ] Implement route parameter parsing (`:id`, `:slug`, etc.)
-- [ ] Add route-to-controller mapping
-- [ ] Implement closure-based routes
-- [ ] Add named routes functionality
-- [ ] Create route groups with prefixes
-- [ ] Implement RESTful resource routing (`wee::resource()`)
+- [x] Build router class with HTTP method support (GET, POST, PUT, DELETE, PATCH)
+- [x] Implement route parameter parsing (`:id`, `:slug`, etc.)
+- [x] Add route-to-controller mapping
+- [x] Implement closure-based routes
+- [x] Add named routes functionality
+- [x] Create route groups with prefixes
+- [x] Implement RESTful resource routing (`wee::resource()`)
 
 ### 1.3 Request/Response
-- [ ] Create Request class for accessing input data
-- [ ] Implement query string, POST data, and file upload handling
-- [ ] Build Response class with status codes
-- [ ] Add JSON response helper
-- [ ] Implement redirect functionality
-- [ ] Add view rendering response
-- [ ] Create cookie and session helpers
+- [x] Create Request class for accessing input data
+- [x] Implement query string, POST data, and file upload handling
+- [x] Build Response class with status codes
+- [x] Add JSON response helper
+- [x] Implement redirect functionality
+- [x] Add view rendering response
+- [x] Create cookie and session helpers
 
 ## Phase 2: MVC Implementation
 
