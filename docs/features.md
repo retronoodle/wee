@@ -4,7 +4,7 @@
 
 ## Core Philosophy
 
-- **Tiny footprint**: Core framework under 500 lines
+- **Tiny footprint**: Minimal, efficient core
 - **Zero dependencies**: Works standalone, no composer packages required
 - **MVC Architecture**: Full Model-View-Controller support
 - **Flask-minimal, Laravel-elegant**: Best of both worlds
