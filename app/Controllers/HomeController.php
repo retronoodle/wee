@@ -2,10 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Controller;
+
 /**
  * Example Home Controller
  */
-class HomeController {
+class HomeController extends Controller {
 
     public function index() {
         return 'Home page from controller';

@@ -409,10 +409,68 @@ class wee {
                 throw new \Exception("Method '$method' not found in controller '$controller'");
             }
 
-            return call_user_func_array([$instance, $method], array_values($params));
+            // Dependency injection for controller methods
+            $methodParams = self::resolveMethodDependencies($instance, $method, $params);
+
+            return call_user_func_array([$instance, $method], $methodParams);
         }
 
         throw new \Exception("Invalid route handler");
+    }
+
+    /**
+     * Resolve method dependencies using reflection
+     */
+    private static function resolveMethodDependencies($instance, $method, $routeParams) {
+        $reflection = new \ReflectionMethod($instance, $method);
+        $parameters = $reflection->getParameters();
+        $resolved = [];
+
+        foreach ($parameters as $param) {
+            $type = $param->getType();
+
+            // Type-hinted parameter (dependency injection)
+            if ($type && !$type->isBuiltin()) {
+                $className = $type->getName();
+
+                // Inject Request instance
+                if ($className === 'App\\Request' || is_subclass_of($className, 'App\\Request')) {
+                    $resolved[] = self::$request;
+                    continue;
+                }
+
+                // Inject Response instance
+                if ($className === 'App\\Response') {
+                    $resolved[] = new App\Response();
+                    continue;
+                }
+
+                // Try to instantiate the class
+                if (class_exists($className)) {
+                    $resolved[] = new $className();
+                    continue;
+                }
+            }
+
+            // Route parameter
+            $paramName = $param->getName();
+            if (isset($routeParams[$paramName])) {
+                $resolved[] = $routeParams[$paramName];
+                unset($routeParams[$paramName]);
+                continue;
+            }
+
+            // Default value
+            if ($param->isDefaultValueAvailable()) {
+                $resolved[] = $param->getDefaultValue();
+                continue;
+            }
+
+            // No value available
+            throw new \Exception("Cannot resolve parameter '{$paramName}' for {$method}");
+        }
+
+        return $resolved;
     }
 
     /**

@@ -2,19 +2,19 @@
 
 namespace App\Controllers;
 
+use App\Controller;
 use App\Request;
-use App\Response;
 
-class ExampleController {
+class ExampleController extends Controller {
 
     /**
-     * Example: Using Request object
+     * Example: Using Request object (auto-injected)
      */
     public function testRequest(Request $request) {
         $name = $request->input('name', 'Guest');
         $page = $request->query('page', 1);
 
-        return (new Response())->json([
+        return $this->json([
             'name' => $name,
             'page' => $page,
             'method' => $request->method(),
@@ -23,38 +23,38 @@ class ExampleController {
     }
 
     /**
-     * Example: Using Response object
+     * Example: Using helper methods
      */
     public function testResponse() {
-        return (new Response())
-            ->setContent('Hello from Response!')
-            ->status(200)
+        return $this->status(200)
+            ->setContent('Hello from Controller!')
             ->header('X-Custom-Header', 'Wee Framework');
     }
 
     /**
-     * Example: JSON response
+     * Example: JSON response using helper
      */
     public function testJson() {
-        return (new Response())->json([
+        return $this->json([
             'message' => 'Success',
             'framework' => 'Wee'
         ], 201);
     }
 
     /**
-     * Example: Redirect
+     * Example: Redirect using helper
      */
     public function testRedirect() {
-        return (new Response())->redirect('/');
+        return $this->redirect('/');
     }
 
     /**
-     * Example: Cookie
+     * Example: Route parameters with dependency injection
      */
-    public function testCookie() {
-        return (new Response())
-            ->setContent('Cookie set!')
-            ->cookie('test_cookie', 'cookie_value', time() + 3600);
+    public function showUser(Request $request, $id) {
+        return $this->json([
+            'id' => $id,
+            'all_query_params' => $request->all()
+        ]);
     }
 }

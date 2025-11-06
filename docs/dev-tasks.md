@@ -30,10 +30,10 @@
 ## Phase 2: MVC Implementation
 
 ### 2.1 Controllers
-- [ ] Create base Controller class
-- [ ] Implement controller instantiation and method calling
-- [ ] Add dependency injection for controller methods
-- [ ] Create helper methods (view, json, redirect, etc.)
+- [x] Create base Controller class
+- [x] Implement controller instantiation and method calling
+- [x] Add dependency injection for controller methods
+- [x] Create helper methods (view, json, redirect, etc.)
 - [ ] Implement route model binding
 
 ### 2.2 Models (Active Record)

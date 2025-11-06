@@ -15,8 +15,12 @@ wee::get('/hello/:name', function($name) {
     return "Hello, $name!";
 });
 
-// Controller route
-// wee::get('/users', 'UserController@index');
+// Controller routes (testing Phase 2.1)
+wee::get('/home', 'HomeController@index');
+wee::get('/home/:id', 'HomeController@show');
+wee::get('/test/request', 'ExampleController@testRequest');
+wee::get('/test/json', 'ExampleController@testJson');
+wee::get('/test/user/:id', 'ExampleController@showUser');
 
 // Named route
 // wee::get('/dashboard', 'DashboardController@index')->name('dashboard');
