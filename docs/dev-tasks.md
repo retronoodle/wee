@@ -37,15 +37,15 @@
 - [ ] Implement route model binding
 
 ### 2.2 Models (Active Record)
-- [ ] Create base Model class
-- [ ] Implement database connection (PDO)
-- [ ] Build query builder (where, select, join, etc.)
-- [ ] Add CRUD operations (find, create, update, delete)
-- [ ] Implement `get()`, `first()`, `all()` methods
-- [ ] Add relationship methods (hasMany, belongsTo, hasOne)
-- [ ] Create timestamps functionality (created_at, updated_at)
-- [ ] Implement soft deletes
-- [ ] Add model events (creating, created, updating, updated, etc.)
+- [x] Create base Model class
+- [x] Implement database connection (PDO)
+- [x] Build query builder (where, select, join, etc.)
+- [x] Add CRUD operations (find, create, update, delete)
+- [x] Implement `get()`, `first()`, `all()` methods
+- [x] Add relationship methods (hasMany, belongsTo, hasOne)
+- [x] Create timestamps functionality (created_at, updated_at)
+- [x] Implement soft deletes
+- [x] Add model events (creating, created, updating, updated, etc.)
 
 ### 2.3 Views
 - [ ] Create view rendering engine (PHP-based)

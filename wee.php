@@ -525,4 +525,11 @@ class wee {
     public static function view($template, $data = []) {
         return (new App\Response())->view($template, $data);
     }
+
+    /**
+     * Get Database instance
+     */
+    public static function db() {
+        return App\Database::getInstance();
+    }
 }
